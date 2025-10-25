@@ -4,6 +4,12 @@ import { logger } from "../utils/logger";
 
 export const extractTextFromUrl = async (fileUrl: string): Promise<string> => {
   try {
+    if (!fileUrl) {
+      const error = new Error("fileUrl is required");
+      (error as any).status = 400;
+      throw error;
+    }
+
     const res = await axios.get<ArrayBuffer>(fileUrl, {
       responseType: "arraybuffer",
     });
