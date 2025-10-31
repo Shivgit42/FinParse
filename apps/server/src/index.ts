@@ -1,6 +1,6 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import { clerkMiddleware } from "@clerk/express";
 
 import uploadRouter from "./routes/upload.route";
@@ -8,8 +8,6 @@ import parseRouter from "./routes/parse.route";
 import userRouter from "./routes/user.route";
 import { logger } from "./utils/logger";
 import { errorHandler } from "./utils/errorHandler";
-
-dotenv.config();
 
 const app = express();
 
