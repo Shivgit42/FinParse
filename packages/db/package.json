@@ -1,14 +1,20 @@
 {
   "name": "@repo/db",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
-      "import": "./index.ts",
-      "default": "./index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
-    "./client": "./client.ts",
-    "./schema": "./schema.ts"
+    "./client": "./dist/client.js",
+    "./schema": "./dist/schema.js"
+  },
+  "scripts": {
+    "build": "tsc -b"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
