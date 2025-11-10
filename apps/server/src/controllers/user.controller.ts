@@ -37,8 +37,10 @@ export const getUserDocuments = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req.params;
-    if (!userId) return res.status(400).json({ error: "userId is required" });
+    // Prefer Clerk auth user id
+    const authUserId = (req as any).auth?.userId as string | undefined;
+    const userId = authUserId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     const userDocs = await db
       .select()

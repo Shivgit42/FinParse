@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response } from "express";
-import { successResponse } from "../utils/response";
-import { logger } from "../utils/logger";
+import { Request, Response, NextFunction } from "express";
 import { extractTextFromUrl } from "../services/ocr.service";
 import { labelWithAI } from "../services/aiLabeler.service";
-import { db, documents } from "@repo/db";
+import { db } from "@repo/db/client";
+import { documents, eq } from "@repo/db";
+import { successResponse } from "../utils/response";
+import { logger } from "../utils/logger";
 
 export const handleParse = async (
   req: Request,
@@ -11,34 +12,27 @@ export const handleParse = async (
   next: NextFunction
 ) => {
   try {
-    const { fileUrl, userId } = req.body;
-    if (!fileUrl) {
-      res.status(400).json({ error: "fileUrl is required" });
-      return;
-    }
+    const { documentId } = req.body;
+    if (!documentId)
+      return res.status(400).json({ error: "documentId is required" });
 
-    logger.info(`Starting OCR for ${fileUrl}`);
-    const rawText = await extractTextFromUrl(fileUrl);
+    const doc = await db.query.documents.findFirst({
+      where: eq(documents.id, documentId),
+    });
+    if (!doc) return res.status(404).json({ error: "Document not found" });
 
-    logger.info("Running AI labeler");
-    const parsedData = await labelWithAI(rawText);
+    logger.info(`Starting OCR for document ${documentId}`);
+    const rawText = await extractTextFromUrl(doc.fileUrl);
 
-    const [savedDoc] = await db
-      .insert(documents)
-      .values({
-        userId: userId || null,
-        fileUrl,
-        parsedData,
-        status: "DONE",
-      })
-      .returning();
+    logger.info(`Running AI labeling for document ${documentId}`);
+    const aiData = await labelWithAI(rawText);
 
-    if (!savedDoc) {
-      throw new Error("Failed to save document");
-    }
+    await db
+      .update(documents)
+      .set({ parsedData: aiData, status: "PARSED" })
+      .where(eq(documents.id, documentId));
 
-    logger.info(`Document saved with id: ${savedDoc.id}`);
-    return successResponse(res, 200, { document: savedDoc });
+    return successResponse(res, 200, { parsedData: aiData });
   } catch (err) {
     next(err);
   }
