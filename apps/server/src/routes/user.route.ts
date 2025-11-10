@@ -5,6 +5,6 @@ import { requireAuth } from "@clerk/express";
 const router: Router = express.Router();
 
 router.post("/", createUser);
-router.get("/:userId/documents", requireAuth, getUserDocuments);
+router.get("/documents", requireAuth, getUserDocuments);
 
 export default router;
