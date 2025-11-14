@@ -7,6 +7,7 @@ import {
   pgEnum,
 } from "drizzle-orm/pg-core";
 
+// Enum for document status
 export const documentStatusEnum = pgEnum("document_status", [
   "UPLOADED",
   "PARSING",
@@ -16,7 +17,7 @@ export const documentStatusEnum = pgEnum("document_status", [
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  clerkId: text("clerk_id").notNull().unique(),
+  clerkId: text("clerk_id").notNull().unique(), // ← This field MUST exist
   email: text("email").notNull().unique(),
   name: text("name"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -37,6 +38,7 @@ export const documents = pgTable("documents", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Type definition for parsed data
 export interface ParsedDocumentData {
   document_type?: "invoice" | "receipt" | "statement" | null;
   invoice_number?: string | null;
