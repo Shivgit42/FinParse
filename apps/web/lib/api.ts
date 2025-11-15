@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import { Document, ApiResponse, User } from "./types";
+import { ParsedDocumentData } from "@repo/db/schema";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
@@ -81,8 +82,10 @@ export const getDocument = async (
 export const parseDocument = async (
   documentId: string,
   token: string
-): Promise<{ parsedData: any }> => {
-  const response = await api.post<ApiResponse<{ parsedData: any }>>(
+): Promise<{ parsedData: ParsedDocumentData }> => {
+  const response = await api.post<
+    ApiResponse<{ parsedData: ParsedDocumentData }>
+  >(
     "/parse",
     { documentId },
     {
