@@ -9,7 +9,7 @@ import {
 import { Document } from "@/lib/types";
 
 export function useDocuments() {
-  const { getToken } = useAuth();
+  const { getToken, isLoaded, isSignedIn } = useAuth();
 
   return useQuery({
     queryKey: ["documents"],
@@ -18,6 +18,7 @@ export function useDocuments() {
       if (!token) throw new Error("No auth token");
       return getUserDocuments(token);
     },
+    enabled: isLoaded && isSignedIn, // Only fetch when Clerk is loaded and user is signed in
     refetchInterval: (query) => {
       // Check if any document is processing
       const documents = query.state.data as Document[] | undefined;
