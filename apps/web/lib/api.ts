@@ -34,6 +34,7 @@ export const uploadDocument = async (
   token: string
 ): Promise<Document> => {
   const formData = new FormData();
+  console.log(formData);
   formData.append("file", file);
 
   const response = await api.post<ApiResponse<{ document: Document }>>(
